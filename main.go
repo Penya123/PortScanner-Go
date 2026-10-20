@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"strconv"
+	"time"
 )
 
 func main() {
@@ -33,12 +34,12 @@ func main() {
 
 	for i := 0; i < len(ports); i++ {
 		addressPort := address + ":" + strconv.Itoa(ports[i])
-		connection, err := net.Dial("tcp", addressPort)
+		connection, err := net.DialTimeout("tcp", addressPort, 15*time.Second)
 		if err == nil {
 			fmt.Printf("Port %d in %s is OPEN UwU\n", ports[i], address)
 			connection.Close()
 		} else {
-			fmt.Printf("Port %d in %s is CLOSED UnU\n", ports[i], address)
+			fmt.Printf("Port %d in %s is CLOSED or timeout UnU\n", ports[i], address)
 		}
 	}
 
