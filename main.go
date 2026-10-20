@@ -6,10 +6,11 @@ import (
 	"strconv"
 	"time"
 	"sync"
+	"os"
 )
 
 func main() {
-	address := "scanme.nmap.org"
+	address := os.Args[1]
 
 	var ports []int = []int{
 		21,    //ftp
