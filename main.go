@@ -5,10 +5,12 @@ import (
 	"net"
 	"strconv"
 	"time"
+	"sync"
 )
 
 func main() {
 	address := "scanme.nmap.org"
+
 	var ports []int = []int{
 		21,    //ftp
 		22,    //ssh
@@ -32,15 +34,24 @@ func main() {
 		27017, //MongoDB
 	}
 
+	var wg sync.WaitGroup
+	wg.Add(len(ports))
+
 	for i := 0; i < len(ports); i++ {
-		addressPort := address + ":" + strconv.Itoa(ports[i])
-		connection, err := net.DialTimeout("tcp", addressPort, 15*time.Second)
-		if err == nil {
-			fmt.Printf("Port %d in %s is OPEN UwU\n", ports[i], address)
-			connection.Close()
-		} else {
-			fmt.Printf("Port %d in %s is CLOSED or timeout UnU\n", ports[i], address)
-		}
+		go scann(address, i, ports, &wg)
 	}
 
+	wg.Wait()
+}
+
+func scann(address string, i int, ports []int, wg *sync.WaitGroup){
+	addressPort := address + ":" + strconv.Itoa(ports[i])
+	connection, err := net.DialTimeout("tcp", addressPort, 5*time.Second)
+	if err == nil {
+		fmt.Printf("Port %d in %s is OPEN UwU\n", ports[i], address)
+		connection.Close()
+	} else {
+		fmt.Printf("Port %d in %s is CLOSED or timeout UnU\n", ports[i], address)
+	}
+	wg.Done()
 }
