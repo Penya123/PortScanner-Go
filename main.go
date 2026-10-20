@@ -35,23 +35,23 @@ func main() {
 	}
 
 	var wg sync.WaitGroup
-	wg.Add(len(ports))
 
 	for i := 0; i < len(ports); i++ {
-		go scann(address, i, ports, &wg)
+		wg.Add(1)
+		go scann(address, ports[i], &wg)
 	}
 
 	wg.Wait()
 }
 
-func scann(address string, i int, ports []int, wg *sync.WaitGroup){
-	addressPort := address + ":" + strconv.Itoa(ports[i])
+func scann(address string, port int, wg *sync.WaitGroup){
+	addressPort := address + ":" + strconv.Itoa(port)
 	connection, err := net.DialTimeout("tcp", addressPort, 5*time.Second)
 	if err == nil {
-		fmt.Printf("Port %d in %s is OPEN UwU\n", ports[i], address)
+		fmt.Printf("Port %d in %s is OPEN UwU\n", port, address)
 		connection.Close()
 	} else {
-		fmt.Printf("Port %d in %s is CLOSED or timeout UnU\n", ports[i], address)
+		fmt.Printf("Port %d in %s is CLOSED or timeout UnU\n", port, address)
 	}
 	wg.Done()
 }
